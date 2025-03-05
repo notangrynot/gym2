@@ -4,7 +4,7 @@
     <style>
         body {
             margin: 0;
-            height: 100vh; /* 增加页面高度用于滚动 */
+            height: 200vh; /* 增加页面高度用于滚动 */
             overflow: auto;
         }
 
@@ -12,8 +12,10 @@
             width: 100%;
             height: 100vh;
             object-fit: contain;
-            position: relative;
+            position: fixed;
             z-index: 1;
+            top:0;
+            left:0;
             transition: top 0.3s ease; /* 添加过渡效果 */
         }
 
@@ -126,7 +128,13 @@
     </style>
 </head>
 <body>
-    <img src="graph1.jpg" id="main-image" alt="主图">
+
+    <div id="container">
+        <img src="graph1.jpg" id="main-image" alt="主图">
+    </div>
+
+
+
     <img src="graph2.jpg" id="blur-image" alt="模糊效果图">
 
     <!-- 灰圆容器 -->
@@ -148,6 +156,15 @@
     </div>
 
     <script>
+
+        function setFullHeight() {
+            const element = document.getElementById('container');
+            element.style.height = `${window.innerHeight}px`;
+        }
+
+        window.addEventListener('load', setFullHeight);
+        window.addEventListener('resize', setFullHeight);
+
         const mainImage = document.getElementById('main-image');
         const blurImage = document.getElementById('blur-image');
         const circleContainer = document.getElementById('circle-container');
