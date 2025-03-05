@@ -10,10 +10,11 @@
 
         #main-image {
             width: 100%;
-            height: 100vh;
+            height: 100%;
             object-fit: cover;
             position: relative;
             z-index: 1;
+            transition: top 0.3s ease; /* 添加过渡效果 */
         }
 
         #blur-image {
@@ -69,19 +70,25 @@
         /* 隐藏的按钮 */
         #hidden-button {
             position: fixed;
-            top: 33.33%; /* 屏幕从上至下三分之一处 */
+            top: 28%; /* 屏幕从上至下三分之一处 */
             left: 20px; /* 靠左 */
-            width: 100px; /* 增大宽度 */
-            height: 100px; /* 增大高度 */
+            width: 200px; /* 增大宽度 */
+            height: 200px; /* 增大高度 */
             background-color: transparent; /* 背景透明 */
             border: none; /* 移除边框 */
             color: transparent; /* 字体透明 */
             z-index: 5;
+            user-select:none;
             cursor: pointer;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.1s ease, transform 0.1s ease;
             pointer-events: none;
         }
+        #hidden-button:active, #hidden-div:focus {
+            background-color: transparent; /* 移除点击时的背景色 */
+            box-shadow: none; /* 移除点击时的阴影 */
+        }
+
 
         /* 第三个图片的容器 */
         #third-image-container {
@@ -111,8 +118,8 @@
     </style>
 </head>
 <body>
-    <img src="main-image.jpg" id="main-image" alt="主图">
-    <img src="same-image.jpg" id="blur-image" alt="模糊效果图">
+    <img src="graph1.jpg" id="main-image" alt="主图">
+    <img src="graph2.jpg" id="blur-image" alt="模糊效果图">
 
     <!-- 灰圆容器 -->
     <div id="circle-container">
@@ -133,6 +140,7 @@
     </div>
 
     <script>
+        const mainImage = document.getElementById('main-image');
         const blurImage = document.getElementById('blur-image');
         const circleContainer = document.getElementById('circle-container');
         const circleLeft = document.getElementById('circle-left');
@@ -141,8 +149,10 @@
         const overlay = document.getElementById('overlay');
         const hiddenButton = document.getElementById('hidden-button');
         const thirdImageContainer = document.getElementById('third-image-container');
-        const threshold = 300; // 切换效果的滚动阈值
+        const threshold = 500; // 切换效果的滚动阈值
         const circleSplitDistance = 150; // 灰圆分裂的距离
+        const blurStartThreshold = 300; // 下拉到 100px 时才开始显示 blur-image
+        const imageGap = 20; // 主图与模糊图之间的间隔
 
         let startY = 0; // 记录触摸起始位置
 
@@ -157,12 +167,21 @@
 
             // 只有在页面顶部且下拉时才触发效果
             if (window.scrollY === 0 && deltaY > 0) {
-                const progress = Math.min(deltaY / threshold, 1);
-                const offset = (1 - progress) * -100;
+                const progress = Math.max((deltaY - blurStartThreshold) / (threshold - blurStartThreshold), 0);
 
-                blurImage.style.opacity = progress;
-                blurImage.style.top = `${offset}%`;
-                blurImage.style.filter = `blur(${10 - (progress * 10)}px)`;
+                // 控制 blur-image 的显示
+                if (deltaY >= blurStartThreshold) {
+                    blurImage.style.opacity = progress;
+                    blurImage.style.top = `${-100 + (progress * 100)}%`;
+                    blurImage.style.filter = `blur(${10 - (progress * 10)}px)`;
+
+                    // 控制 main-image 的移动
+                    mainImage.style.top = `${progress * (100 + imageGap)}%`; // 主图向下移动，并保持间隔
+                } else {
+                    blurImage.style.opacity = 0;
+                    blurImage.style.top = '-100%';
+                    mainImage.style.top = '0'; // 主图回到原位
+                }
 
                 // 控制灰圆的动态变化
                 if (deltaY > 0 && deltaY < circleSplitDistance) {
@@ -194,6 +213,10 @@
                     blurImage.classList.remove('active');
                 }
             }
+        });
+
+        document.addEventListener('touchend', () => {
+            circleContainer.style.display = 'none'; // 手指离开时隐藏灰色小球
         });
 
         // 隐藏按钮点击事件
