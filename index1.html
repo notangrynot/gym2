@@ -4,7 +4,7 @@
     <style>
         body {
             margin: 0;
-            height: 200vh; /* 增加页面高度用于滚动 */
+            height: 100vh; /* 增加页面高度用于滚动 */
             overflow-x: hidden;
         }
 
@@ -13,6 +13,7 @@
             height: 100vh;
             object-fit: cover;
             position: relative;
+            object-position: center;
             z-index: 1;
             transition: top 0.3s ease; /* 添加过渡效果 */
         }
@@ -67,26 +68,34 @@
             pointer-events: none;
         }
 
-        /* 隐藏的按钮 */
+
         #hidden-button {
             position: fixed;
-            top: 28%; /* 屏幕从上至下三分之一处 */
-            left: 20px; /* 靠左 */
-            width: 200px; /* 增大宽度 */
-            height: 200px; /* 增大高度 */
-            background-color: transparent; /* 背景透明 */
-            border: none; /* 移除边框 */
-            color: transparent; /* 字体透明 */
+            top: 28%;
+            left: 20px;
+            width: 200px;
+            height: 200px;
+            background-color: transparent;
+            border: none;
+            color: transparent;
             z-index: 5;
-            user-select:none;
+            user-select: none;
             cursor: pointer;
             opacity: 0;
             transition: opacity 0.1s ease, transform 0.1s ease;
             pointer-events: none;
+            outline: none !important; /* 移除轮廓 */
+            box-shadow: none !important; /* 移除阴影 */
+            -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
+            -moz-appearance: none; /* 移除 Firefox 默认样式 */
+            -webkit-appearance: none; /* 移除 Safari/Chrome 默认样式 */
+            appearance: none; /* 标准属性 */
         }
-        #hidden-button:active, #hidden-div:focus {
-            background-color: transparent; /* 移除点击时的背景色 */
-            box-shadow: none; /* 移除点击时的阴影 */
+
+        #hidden-button:focus,
+        #hidden-button:active {
+            outline: none !important;
+            box-shadow: none !important;
         }
 
 
