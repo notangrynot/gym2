@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>滑动效果</title>
+  <style>
+    /* 全局样式 */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    /* 主图样式 */
+    .main-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('main-image.jpg'); /* 替换为主图 */
+      background-size: cover;
+      background-position: center;
+      z-index: 1;
+      transition: top 0.3s; /* 添加过渡效果 */
+    }
+
+    /* 副图样式 */
+    .secondary-image {
+      position: absolute;
+      top: -100%; /* 初始位置在屏幕上方，超出屏幕范围 */
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('same-image.jpg'); /* 替换为副图 */
+      background-size: cover;
+      background-position: center;
+      z-index: 2;
+      transition: top 0.3s; /* 添加过渡效果 */
+    }
+
+    /* 白色块样式 */
+    .white-block {
+      position: absolute;
+      top: 100%; /* 初始位置在屏幕下方，超出屏幕范围 */
+      left: 0;
+      width: 100%;
+      height: 0; /* 初始高度为0 */
+      background-color: white;
+      z-index: 3;
+      transition: height 0.3s;
+    }
+
+    /* 灰色球样式 */
+    .ball {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      background-color: gray;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      opacity: 0; /* 初始状态下隐藏 */
+      transition: opacity 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <!-- 主图 -->
+  <div class="main-image"></div>
+
+  <!-- 副图 -->
+  <div class="secondary-image"></div>
+
+  <!-- 白色块 -->
+  <div class="white-block"></div>
+
+  <!-- 灰色球 -->
+  <div class="ball"></div>
+
+  <script>
+    // 获取元素
+    const container = document.body;
+    const mainImage = document.querySelector('.main-image');
+    const secondaryImage = document.querySelector('.secondary-image');
+    const whiteBlock = document.querySelector('.white-block');
+    const ball = document.querySelector('.ball');
+
+    let startY = 0; // 记录触摸起始位置
+    let currentY = 0; // 记录当前触摸位置
+    const screenHeight = window.innerHeight; // 屏幕高度
+    const triggerDistance = screenHeight / 3; // 触发副图显示的距离
+
+    // 监听触摸开始事件
+    container.addEventListener('touchstart', (e) => {
+      startY = e.touches[0].clientY;
+    });
+
+    // 监听触摸移动事件
+    container.addEventListener('touchmove', (e) => {
+      currentY = e.touches[0].clientY;
+      const deltaY = currentY - startY; // 计算滑动距离
+
+      if (deltaY > 0) {
+        const progress = Math.min(deltaY / triggerDistance, 1); // 计算滑动进度
+
+        // 滑动距离小于触发距离时，显示灰色小球
+        if (deltaY < triggerDistance) {
+          ball.style.opacity = progress;
+        } else {
+          // 滑动距离超过触发距离时，副图从上方逐渐滑入
+          const secondaryImageTop = -100 + (deltaY - triggerDistance) / (screenHeight - triggerDistance) * 100;
+          secondaryImage.style.top = `${secondaryImageTop}%`;
+
+          // 主图随副图滑入而向下移动
+          const mainImageTop = (deltaY - triggerDistance) / (screenHeight - triggerDistance) * 100;
+          mainImage.style.top = `${mainImageTop}%`;
+
+          // 动态调整白色块的高度和位置
+          const whiteBlockHeight = Math.min(deltaY - triggerDistance, screenHeight / 4); // 白色块的最大高度为屏幕高度的四分之一
+          whiteBlock.style.height = `${whiteBlockHeight}px`;
+          whiteBlock.style.top = `calc(100% - ${whiteBlockHeight}px)`; // 白色块始终位于主图和副图之间
+        }
+      }
+    });
+
+
+  </script>
+</body>
+</html>
